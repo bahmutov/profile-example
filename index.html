@@ -2,58 +2,37 @@
 <html lang="en">
 
 <head>
-  <title>Vanilla primes</title>
-  <style>
-    table {
-      border-spacing: 5px;
-    }
-    td {
-      border: 1px solid black;
-      border-radius: 2px;
-      /* box-shadow: 1px 20px 30px 4px rgba(50, 50, 50, 0.5); */
-      background: radial-gradient(farthest-side, white, lightGray);
-    }
-  </style>
+  <title>Profile example</title>
 </head>
 
 <body>
-  <h1>vanilla primes</h1>
-  <p>Simple vanilla JavaScript application that finds first N prime numbers</p>
+  <h1>profile example</h1>
+  <p>Finds first N prime numbers using web worker.</p>
 
   <div>
-    <button id="find">Find</button> <input id="n" value="100" /> primes.
-    <table>
-      <thead>
-        <th>index</th><th>prime</th>
-      </thead>
-      <tbody id="results">
-      </tbody>
-    </table>
+    <button id="find">Find</button> <input id="n" value="1000" /> primes.
   </div>
 
+  <script src="https://rawgit.com/bahmutov/console-log-div/master/console-log-div.js"></script>
+
   <script>
+
     var primesApp = (function primesApp() {
 
       var worker = new Worker('worker.js');
-
-      function primeToRow(p, k) {
-        return '<tr><td>' + (k + 1) + '</td><td>' + p + '</td></tr>';
-      }
-
-      function renderPrimes(primes) {
-        var html = primes.map(primeToRow).join('\n');
-        document.querySelector('#results').innerHTML = html;
-      }
+      var started;
 
       worker.onmessage = function (e) {
-        console.log('worker has finished');
-        renderPrimes(e.data);
+        var finished = performance.now();
+        console.log('worker has finished and returned', e.data.length, 'primes');
+        console.log('took', finished - started, 'ms');
       };
 
       return {
         worker: worker,
         findFirstPrimes: function (n) {
           console.log('finding first', n, 'primes');
+          started = performance.now();
           worker.postMessage({ cmd: 'primes', n: n });
         }
       };

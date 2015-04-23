@@ -2,14 +2,18 @@
 
 
   function isPrime(n) {
-    var k;
-    var limit = Math.sqrt(n);
-    for (k = 2; k <= limit; k += 1) {
-      if (n % k === 0) {
-        return false;
+    try {
+      var k;
+      var limit = Math.sqrt(n);
+      for (k = 2; k <= limit; k += 1) {
+        if (n % k === 0) {
+          return false;
+        }
       }
+      return true;
+    } catch (e) {
+      return false;
     }
-    return true;
   }
   /*
   console.assert(isPrime(1));
@@ -24,8 +28,8 @@
   */
 
   // finds Nth prime
-  var foundPrimes = [];
   function findPrime(n) {
+    var foundPrimes = [];
     var k = foundPrimes.length ? foundPrimes[foundPrimes.length - 1] + 1 : 1;
     while (foundPrimes.length < n) {
       if (isPrime(k)) {
