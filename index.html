@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Vanilla primes</title>
+  <style>
+    table {
+      border-spacing: 5px;
+    }
+    td {
+      border: 1px solid black;
+      border-radius: 2px;
+      /* box-shadow: 1px 20px 30px 4px rgba(50, 50, 50, 0.5); */
+      background: radial-gradient(farthest-side, white, lightGray);
+    }
+  </style>
+</head>
+
+<body>
+  <h1>vanilla primes</h1>
+  <p>Simple vanilla JavaScript application that finds first N prime numbers</p>
+
+  <div>
+    <button id="find">Find</button> <input id="n" value="100" /> primes.
+    <table>
+      <thead>
+        <th>index</th><th>prime</th>
+      </thead>
+      <tbody id="results">
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    var primesApp = (function primesApp() {
+
+      var worker = new Worker('worker.js');
+
+      function primeToRow(p, k) {
+        return '<tr><td>' + (k + 1) + '</td><td>' + p + '</td></tr>';
+      }
+
+      function renderPrimes(primes) {
+        var html = primes.map(primeToRow).join('\n');
+        document.querySelector('#results').innerHTML = html;
+      }
+
+      worker.onmessage = function (e) {
+        console.log('worker has finished');
+        renderPrimes(e.data);
+      };
+
+      return {
+        worker: worker,
+        findFirstPrimes: function (n) {
+          console.log('finding first', n, 'primes');
+          worker.postMessage({ cmd: 'primes', n: n });
+        }
+      };
+
+    }());
+
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelector('#find').addEventListener('click', function () {
+        var n = Number(document.querySelector('#n').value);
+        primesApp.findFirstPrimes(n);
+      });
+    });
+
+  </script>
+</body>
+</html>
